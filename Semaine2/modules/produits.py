@@ -10,7 +10,7 @@ def lire_liste(chemin_fichier):
 
     produit = df.values.tolist()
 
-    print(tabulate(produit, headers=df.columns, tablefmt="grid"))
+    print(tabulate(produit, headers=df.columns, tablefmt="rounded_outline"))
 
 
 
@@ -42,12 +42,13 @@ def ajouter_produit(chemin_fichier):
 
 
 
+
 def supprimer_produit(chemin_fichier):
     input_recherche = input("Entrez le nom du produit à supprimer : ")
 
     df = pd.read_csv(chemin_fichier)
 
-    filtered_df = df.loc[df['NOM'].str.lower().str.contains(input_recherche.lower())]
+    filtered_df = df[~df['NOM'].str.lower().str.contains(input_recherche.lower())]
 
     if len(filtered_df) < len(df):
         filtered_df.to_csv(chemin_fichier, index=False)
@@ -57,10 +58,12 @@ def supprimer_produit(chemin_fichier):
 
 
 
+
+
 def rechercher_produit(chemin_fichier):
 
     os.system("cls")
-    print("1) Recherche séquentielle : ")
+    print("1) Recherche : ")
     input_recherche=str(input("produit a rechercher : "))
     df = pd.read_csv(chemin_fichier)
 
@@ -72,7 +75,7 @@ def rechercher_produit(chemin_fichier):
     
     else: 
         print("Éléments trouvés :") 
-        print(filtered_df)
+        print(tabulate(filtered_df, headers=df.columns, tablefmt="rounded_outline"))
         return True
 
         
@@ -80,9 +83,9 @@ def rechercher_produit(chemin_fichier):
 
 def trier_produit(chemin_fichier):
     i=0
-    print("1) Tri par sélection par nom")
-    print("2) Tri à bulles par prix ")
-    print("3) Tri rapide par quantité")
+    print("1) Tri par nom")
+    print("2) Tri par prix ")
+    print("3) Tri par quantité")
     answer = int(input("Choisir une option : "))
 
     if answer == 1:
@@ -91,7 +94,7 @@ def trier_produit(chemin_fichier):
     
         df = pd.read_csv(chemin_fichier)
         df_sorted = df.sort_values(by="NOM")
-        print(df_sorted)
+        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))
 	
 
 
@@ -102,14 +105,13 @@ def trier_produit(chemin_fichier):
 
         df = pd.read_csv(chemin_fichier)
         df_sorted = df.sort_values(by="PRIX")
-        print(df_sorted)
+        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))
 	
 
     if answer == 3:
         os.system("cls")
         print("3) Tri par quantité :")
-        liste = []
 
         df = pd.read_csv(chemin_fichier)
         df_sorted = df.sort_values(by="QUANTITE")
-        print(df_sorted)
+        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))

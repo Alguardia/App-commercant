@@ -1,6 +1,4 @@
 import os
-import csv
-from tabulate import tabulate
 import pandas as pd
 import hashlib
 
@@ -74,76 +72,20 @@ def login(username,password):
 
 
 
+def password_compromises(password):
+    password_is_compromise = False
 
-def supprimer_user():
-    username = input("Entrez votre nom d'utilisateur : ").strip()
-    password = input("Entrez votre mot de passe : ").strip().encode("utf-8")
-
-    user_csv_path = 'data/user.csv'
-    df = pd.read_csv(user_csv_path)
-
-
-    filtered_df = df.loc[df['username'] == username]
-
-    if filtered_df.empty:
-        print("Aucun utilisateur trouvé avec ce nom.")
-        input("Appuyez sur une touche pour continuer...")
-        return
-
-
-    salt = bytes.fromhex(filtered_df['salt'].values[0])
-
-    password_combined = password + salt
-
-
-    password_hashed = hashlib.sha256(password_combined).hexdigest()
-
-    filtered_df = df.loc[~((df['username'] == username) & (df['password'] == password_hashed))]
-
-    if len(filtered_df) < len(df):
-
-        filtered_df.to_csv(user_csv_path, index=False)
-        print(f"Utilisateur {username} supprimé avec succès.")
-
-
-        nom_fichier = f"{username}.csv"
-        chemin_fichier = os.path.join('data', nom_fichier)
-        if os.path.exists(chemin_fichier):
-            os.remove(chemin_fichier)
-            print(f"Le fichier CSV '{nom_fichier}' a été supprimé.")
-    else:
-        print("Aucun utilisateur trouvé avec ce nom et ce mot de passe.")
-
-    input("Appuyez sur une touche pour continuer...")
-
-
-def liste_commercants():
-
-    user_csv_path = 'data/user.csv'
-    df = pd.read_csv(user_csv_path)
-
-
-    commercants = df['username'].tolist()
-    print("Liste des commerçants :")
-    for commercant in commercants:
-        print(f"- {commercant}")
-
-    input("Appuyez sur une touche pour continuer...")
-
-
-
-def password_compromise():
     nom_fichier = "hashed_passwords.csv"
     chemin_fichier = os.path.join('password', nom_fichier)
-    
     df = pd.read_csv(chemin_fichier)
-    password = input("Mettre votre mot de passe : ")
+    df['Hashed'] = df['Hashed'].str.strip()
     password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-    print(password_hash)
-    print(password)
-    
+
 
     if password_hash in df['Hashed'].values:
-        print('Trouvé :', password)
+        print(f"Le mot de passe est compromis. Hash trouvé: {password_hash}")
+        password_is_compromise = True
     else:
-        print("Pas trouvé")
+        print(f"Le mot de passe n'est pas compromis. Hash non trouvé.")
+    
+    return password_is_compromise
