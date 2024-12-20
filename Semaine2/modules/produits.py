@@ -48,7 +48,7 @@ def supprimer_produit(chemin_fichier):
 
     df = pd.read_csv(chemin_fichier)
 
-    filtered_df = df[~df['NOM'].str.lower().str.contains(input_recherche.lower())]
+    filtered_df = df[~df['NOM'].str.lower().eq(input_recherche.lower())]
 
     if len(filtered_df) < len(df):
         filtered_df.to_csv(chemin_fichier, index=False)

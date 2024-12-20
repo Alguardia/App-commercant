@@ -5,8 +5,9 @@ from modules.gestion_compte import *
 from modules.profil import *
 from modules.admin import *
 
-OKGREEN = '\033[92m'
-WARNING = '\033[0;31m'
+GREEN = '\033[92m'
+RED = '\033[0;31m'
+ORANGE ='\033[93m'
 ENDC = '\033[0m'
 is_logged_in = False
 chemin_fichier=""
@@ -97,10 +98,10 @@ def menu_principal(password_compromise):
         print("")
 
         if password_compromise:
-            print(WARNING + "[X] Votre mot de passe actuel est compromis.\n[!] Aller dans la rubrique Profil pour changer votre mot de passe. " + ENDC)
+            print(RED + "[X] Votre mot de passe actuel est compromis.\n" + ORANGE +"[!] Aller dans la rubrique Profil pour changer votre mot de passe. " + ENDC)
             print("")
         elif password_compromise == False:
-            print(OKGREEN + "[✓] Votre mot de passe est sécurisé." + ENDC)
+            print(GREEN + "[✓] Votre mot de passe est sécurisé." + ENDC)
             print("")
         
         print("1) Profil")
