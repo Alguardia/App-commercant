@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import hashlib
 import requests 
+import tkinter as tk
 
 
 def generate_salt():
@@ -9,19 +10,27 @@ def generate_salt():
     return salt
     
 
-def register():
-    username = input("Mettre votre nom : ")
-    salt = generate_salt()
-    password = input("Mettre votre mot de passe : ").encode("utf-8")
+def register(entrée1_register,entrée2_register, fenetre):
+    password_check=False
+    username_check=False
 
-    if haveibeenpwnd_password(password):
-        print("Changer de mot de passe, le mot de passe est compromis.")
-        input("")
+    username=entrée1_register.get()
+    
+    salt = generate_salt()
+    password=entrée2_register.get()
+
+    password_encode=password.encode("utf-8")
+
+    if haveibeenpwnd_password(password_encode):
+        password_check = True
+        password_status = "[X] Changer de mot de passe, le mot de passe est compromis."
+        label_password = tk.Label(fenetre, text=password_status, fg="red")
+        label_password.place(x=30, y=125)
+        return password_check
         
     else :
-        password = password  + salt
-
-        
+        password = password_encode  + salt
+        print(password)
 
         nom_fichier = f"{username}.csv"
         chemin_fichier = os.path.join('data', nom_fichier)
@@ -31,9 +40,11 @@ def register():
             df = pd.read_csv(user_csv_path)
 
             if username in df['username'].values:
-                print("Erreur : Le nom d'utilisateur existe déjà.")
-                input("")
-                return
+                username_check = True 
+                username_status = "[X] Cette utilisateur existe déjà, changer de nom d'utilisateur."
+                label_username = tk.Label(fenetre, text=username_status, fg="red")
+                label_username.place(x=30, y=125)
+                return username_check
         else:
             df = pd.DataFrame(columns=['username', 'password', 'salt'])
 
@@ -47,7 +58,6 @@ def register():
         df_produit = pd.DataFrame(columns=['NOM', 'PRIX', 'QUANTITE'])
         df_produit.to_csv(chemin_fichier, index=False)
 
-        input("Appuyez sur une touche pour continuer...")
 
 
 
@@ -72,8 +82,9 @@ def verifier_utilisateur(username, password):
 
 
 
-def login(username,password):
-
+def login(entrée1,entrée2):
+    username=entrée1.get()
+    password=entrée2.get()
     if verifier_utilisateur(username, password):
         print("Connexion réussie !")
         return True

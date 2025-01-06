@@ -1,11 +1,13 @@
 import os
 import pandas as pd
 import hashlib
+import tkinter as tk
 
 
-def supprimer_user():
-    username = input("Entrez votre nom d'utilisateur : ").strip()
-    password = input("Entrez votre mot de passe : ").strip().encode("utf-8")
+def supprimer_user(entrée1_remove,entrée2_remove, fenetre):
+
+    username=entrée1_remove.get().strip()
+    password=entrée2_remove.get().strip().encode("utf-8")
 
     user_csv_path = 'data/user.csv'
     df = pd.read_csv(user_csv_path)
@@ -14,8 +16,9 @@ def supprimer_user():
     filtered_df = df.loc[df['username'] == username]
 
     if filtered_df.empty:
-        print("Aucun utilisateur trouvé avec ce nom.")
-        input("Appuyez sur une touche pour continuer...")
+        password_status = "[X] Aucun utilisateur trouvé avec ce nom."
+        label_password = tk.Label(fenetre, text=password_status, fg="red")
+        label_password.place(x=30, y=125)
         return
 
 
@@ -31,30 +34,28 @@ def supprimer_user():
     if len(filtered_df) < len(df):
 
         filtered_df.to_csv(user_csv_path, index=False)
-        print(f"Utilisateur {username} supprimé avec succès.")
-
+        password_status = f"Utilisateur {username} supprimé avec succès."
+        label_password = tk.Label(fenetre, text=password_status, fg="green")
+        label_password.place(x=30, y=125)
 
         nom_fichier = f"{username}.csv"
         chemin_fichier = os.path.join('data', nom_fichier)
         if os.path.exists(chemin_fichier):
             os.remove(chemin_fichier)
-            print(f"Le fichier CSV '{nom_fichier}' a été supprimé.")
+        
     else:
-        print("Aucun utilisateur trouvé avec ce nom et ce mot de passe.")
+        password_status = "Aucun utilisateur trouvé avec ce nom et ce mot de passe."
+        label_password = tk.Label(fenetre, text=password_status, fg="red")
+        label_password.place(x=30, y=125)
 
-    input("Appuyez sur une touche pour continuer...")
 
 
-def liste_commercants():
+
+
+def liste_commercants(fenetre):
 
     user_csv_path = 'data/user.csv'
     df = pd.read_csv(user_csv_path)
 
-
     commercants = df['username'].tolist()
-    print("Liste des commerçants :")
-    for commercant in commercants:
-        print(f"- {commercant}")
-
-    input("Appuyez sur une touche pour continuer...")
-
+    return commercants
