@@ -4,28 +4,45 @@ import hashlib
 from modules.connexion import password_compromises
 import requests
 
-def modifier_password(username):
+def modifier_password(username, entrée1_change,entrée2_change,fenetre):
     global password_compromise
-    print("1) Modifier votre mot de passe")
-    nouveau_password = input("Entrez votre nouveau mot de passe : ")
-
+    
+    old_password = entrée1_change
+    nouveau_password = entrée2_change
+    
     user_csv_path = 'data/user.csv'
     df = pd.read_csv(user_csv_path)
 
 
     filtered_df = df.loc[df['username'] == username]
+
+    if filtered_df.empty:
+        return False
+
     salt = bytes.fromhex(filtered_df['salt'].values[0])
-    nouveau_password_combined = nouveau_password.encode("utf-8") + salt
-    nouveau_password_hashed = hashlib.sha256(nouveau_password_combined).hexdigest()
+    password_combined = old_password.encode("utf-8") + salt
+    password_hashed = hashlib.sha256(password_combined).hexdigest()
 
-    df.loc[df['username'] == username, 'password'] = nouveau_password_hashed
+    if password_hashed == filtered_df['password'].values[0]:
+        verif=True
+    else:
+        verif=False
 
-        
-    df.to_csv(user_csv_path, index=False)
+    if verif:
 
-    password_compromise = password_compromises(nouveau_password)
+        filtered_df = df.loc[df['username'] == username]
+        salt = bytes.fromhex(filtered_df['salt'].values[0])
+        nouveau_password_combined = nouveau_password.encode("utf-8") + salt
+        nouveau_password_hashed = hashlib.sha256(nouveau_password_combined).hexdigest()
 
-    return password_compromise
+        df.loc[df['username'] == username, 'password'] = nouveau_password_hashed
+
+            
+        df.to_csv(user_csv_path, index=False)
+
+        password_compromise = password_compromises(nouveau_password)
+
+        return True ,password_compromise
 
 
 

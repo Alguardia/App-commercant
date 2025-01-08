@@ -5,7 +5,7 @@ import tkinter as tk
 
 
 def supprimer_user(entrée1_remove,entrée2_remove, fenetre):
-
+    informations_good = False
     username=entrée1_remove.get().strip()
     password=entrée2_remove.get().strip().encode("utf-8")
 
@@ -16,9 +16,9 @@ def supprimer_user(entrée1_remove,entrée2_remove, fenetre):
     filtered_df = df.loc[df['username'] == username]
 
     if filtered_df.empty:
-        password_status = "[X] Aucun utilisateur trouvé avec ce nom."
+        password_status = "[X] Les informations sont incorrectes."
         label_password = tk.Label(fenetre, text=password_status, fg="red")
-        label_password.place(x=30, y=125)
+        label_password.place(x=150, y=110)
         return
 
 
@@ -34,19 +34,20 @@ def supprimer_user(entrée1_remove,entrée2_remove, fenetre):
     if len(filtered_df) < len(df):
 
         filtered_df.to_csv(user_csv_path, index=False)
-        password_status = f"Utilisateur {username} supprimé avec succès."
+        password_status = f"[✓] Utilisateur {username} supprimé avec succès."
         label_password = tk.Label(fenetre, text=password_status, fg="green")
-        label_password.place(x=30, y=125)
+        label_password.place(x=150, y=110)
 
         nom_fichier = f"{username}.csv"
         chemin_fichier = os.path.join('data', nom_fichier)
         if os.path.exists(chemin_fichier):
             os.remove(chemin_fichier)
-        
+            
+    
     else:
-        password_status = "Aucun utilisateur trouvé avec ce nom et ce mot de passe."
+        password_status = "[X] Les informations sont incorrectes."
         label_password = tk.Label(fenetre, text=password_status, fg="red")
-        label_password.place(x=30, y=125)
+        label_password.place(x=150, y=110)
 
 
 

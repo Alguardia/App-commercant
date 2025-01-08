@@ -22,15 +22,14 @@ def register(entrée1_register,entrée2_register, fenetre):
     password_encode=password.encode("utf-8")
 
     if haveibeenpwnd_password(password_encode):
-        password_check = True
-        password_status = "[X] Changer de mot de passe, le mot de passe est compromis."
+        
+        password_status = "[X] Changer de mot de passe."
         label_password = tk.Label(fenetre, text=password_status, fg="red")
-        label_password.place(x=30, y=125)
-        return password_check
+        label_password.place(x=150, y=110)
+        return False
         
     else :
         password = password_encode  + salt
-        print(password)
 
         nom_fichier = f"{username}.csv"
         chemin_fichier = os.path.join('data', nom_fichier)
@@ -40,11 +39,10 @@ def register(entrée1_register,entrée2_register, fenetre):
             df = pd.read_csv(user_csv_path)
 
             if username in df['username'].values:
-                username_check = True 
-                username_status = "[X] Cette utilisateur existe déjà, changer de nom d'utilisateur."
+                username_status = "[X] Cette utilisateur existe déjà."
                 label_username = tk.Label(fenetre, text=username_status, fg="red")
-                label_username.place(x=30, y=125)
-                return username_check
+                label_username.place(x=150, y=110)
+                return False
         else:
             df = pd.DataFrame(columns=['username', 'password', 'salt'])
 
@@ -53,11 +51,14 @@ def register(entrée1_register,entrée2_register, fenetre):
         df_combined = pd.concat([df, df_new], ignore_index=True)
         df_combined.to_csv(user_csv_path, index=False)
 
-        print(f"Utilisateur {username} enregistré avec succès !")
+        password_status = f"[✓] Utilisateur {username} enregistré avec succès."
+        label_password = tk.Label(fenetre, text=password_status, fg="green")
+        label_password.place(x=150, y=110)
 
         df_produit = pd.DataFrame(columns=['NOM', 'PRIX', 'QUANTITE'])
         df_produit.to_csv(chemin_fichier, index=False)
 
+        return True
 
 
 
@@ -81,14 +82,18 @@ def verifier_utilisateur(username, password):
         return False
 
 
-
-def login(entrée1,entrée2):
+def login(entrée1,entrée2,fenetre):
     username=entrée1.get()
     password=entrée2.get()
     if verifier_utilisateur(username, password):
-        print("Connexion réussie !")
+        status = "[✓] Connexion réusite."
+        label_username = tk.Label(fenetre, text=status, fg="green")
+        label_username.place(x=150, y=110)
         return True
     else:
+        status = "[X] Connexion refusée."
+        label_username = tk.Label(fenetre, text=status, fg="red")
+        label_username.place(x=150, y=110)
         return False
 
 
