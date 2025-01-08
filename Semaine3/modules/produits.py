@@ -2,31 +2,31 @@ import os
 from tabulate import tabulate
 import csv
 import pandas as pd
-
+import tkinter as tk
 
 def lire_liste(chemin_fichier):
 
     df = pd.read_csv(chemin_fichier)
 
     produit = df.values.tolist()
-
-    print(tabulate(produit, headers=df.columns, tablefmt="rounded_outline"))
-
+    return produit
 
 
-def ajouter_produit(chemin_fichier):
-    print("Ajouter un produit :")
-    inputusernom = input("Nom du produit : ")
-    inputuserprix = input("Prix du produit : ")
-    inputuserquantite = input("Quantité du produit : ")
+
+def ajouter_produit(chemin_fichier,entrée1, entrée2, entrée3, fenetre):
+    
+    inputusernom = entrée1.get()
+    inputuserprix = entrée2.get()
+    inputuserquantite = entrée3.get()
 
   
     if not inputusernom or not inputuserprix or not inputuserquantite:
-        print("Erreur, le champ est vide")
-        return
+        status = "[X] Erreur : Veuillez remplir tous les champs"
+        label_produit = tk.Label(fenetre, text=status, fg="green")
+        label_produit.place(x=150, y=110)
+        return False
 
     produit_data = [[inputusernom.lower(), inputuserprix, inputuserquantite]]
-
 
 
     df_existing = pd.read_csv(chemin_fichier)
@@ -38,13 +38,16 @@ def ajouter_produit(chemin_fichier):
     df_combined.to_csv(chemin_fichier, index=False)
  
 
-    print(f"Produit {inputusernom} ajouté avec succès !")
+    status = "[✓] Produit ajouté avec succès"
+    label_produit = tk.Label(fenetre, text=status, fg="green")
+    label_produit.place(x=150, y=110)
+
+    return True
 
 
 
-
-def supprimer_produit(chemin_fichier):
-    input_recherche = input("Entrez le nom du produit à supprimer : ")
+def supprimer_produit(chemin_fichier, entrée1_remove, fenetre):
+    input_recherche = entrée1_remove.get()
 
     df = pd.read_csv(chemin_fichier)
 
@@ -52,66 +55,61 @@ def supprimer_produit(chemin_fichier):
 
     if len(filtered_df) < len(df):
         filtered_df.to_csv(chemin_fichier, index=False)
-        print(f"Produit '{input_recherche}' supprimé avec succès.")
+        status = "[✓] Produit supprimé avec succès"
+        label_produit = tk.Label(fenetre, text=status, fg="green")
+        label_produit.place(x=150, y=110)
+        return True
     else:
-        print(f"Aucun produit trouvé avec le nom '{input_recherche}'.")
+        status = f"[X] Aucun élement trouvé pour {input_recherche}"
+        label_produit = tk.Label(fenetre, text=status, fg="red")
+        label_produit.place(x=150, y=110)
+        return False
 
 
 
 
 
-def rechercher_produit(chemin_fichier):
+def rechercher_produit(chemin_fichier, entrée1_remove, fenetre):
 
-    os.system("cls")
-    print("1) Recherche : ")
-    input_recherche=str(input("produit a rechercher : "))
+
+    input_recherche= entrée1_remove.get()
+
     df = pd.read_csv(chemin_fichier)
 
     filtered_df = df.loc[(df['NOM'] == input_recherche.lower())]
-
+    print(filtered_df)
     if filtered_df.empty: 
-        print(f"Le produit '{input_recherche}' n'a pas été trouvé.")
+        status = f"[X] Aucun élement trouvé pour {input_recherche}"
+        label_produit = tk.Label(fenetre, text=status, fg="red")
+        label_produit.place(x=150, y=110)
         return False
     
     else: 
-        print("Éléments trouvés :") 
-        print(tabulate(filtered_df, headers=df.columns, tablefmt="rounded_outline"))
+        status = f"{filtered_df}"
+        label_produit = tk.Label(fenetre, text=status, fg="green")
+        label_produit.place(x=150, y=110)
         return True
 
         
 
 
-def trier_produit(chemin_fichier):
-    i=0
-    print("1) Tri par nom")
-    print("2) Tri par prix ")
-    print("3) Tri par quantité")
-    answer = int(input("Choisir une option : "))
+def trier_produit_nom(chemin_fichier):
 
-    if answer == 1:
-        os.system("cls")
-        print("1) Tri par nom : ")
-    
-        df = pd.read_csv(chemin_fichier)
-        df_sorted = df.sort_values(by="NOM")
-        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))
+    df = pd.read_csv(chemin_fichier)
+    df_sorted = df.sort_values(by="NOM")
+    produit = df_sorted.values.tolist()
+    return produit
 	
 
+def trier_produit_prix(chemin_fichier):
+    df = pd.read_csv(chemin_fichier)
+    df_sorted = df.sort_values(by="PRIX")
+    produit = df_sorted.values.tolist()
+    return produit
 
-    if answer == 2:
-        os.system("cls")
-        print("2) Tri par prix : ")
-    
+def trier_produit_quantite(chemin_fichier):
 
-        df = pd.read_csv(chemin_fichier)
-        df_sorted = df.sort_values(by="PRIX")
-        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))
-	
-
-    if answer == 3:
-        os.system("cls")
-        print("3) Tri par quantité :")
-
-        df = pd.read_csv(chemin_fichier)
-        df_sorted = df.sort_values(by="QUANTITE")
-        print(tabulate(df_sorted, headers=df.columns, tablefmt="rounded_outline"))
+    df = pd.read_csv(chemin_fichier)
+    df_sorted = df.sort_values(by="QUANTITE")
+    produit = df_sorted.values.tolist()
+    return produit

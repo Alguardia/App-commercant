@@ -6,16 +6,18 @@ from modules.connexion import *
 from modules.gestion_compte import *
 from modules.profil import *
 from modules.admin import *
+from tkinter import ttk
+
 
 is_logged_in = False
 chemin_fichier=""
 password_compromise= False
 
 
-fenetre = Tk()
+fenetre = tk.Tk()
 fenetre.geometry("400x150")
-v = StringVar() 
 fenetre.title('Menu Connexion')
+
 
 #####################################################   Menu connexion   #################################################################
 
@@ -60,7 +62,7 @@ def login_inter():
     if login(entrée1, entrée2,fenetre):
                 password=entrée2.get()
                 password_compromise = password_compromises(password)
-                menu_principal()
+                fenetre.after(2000,menu_principal)
     
 
 def menu_login():
@@ -238,13 +240,12 @@ def menu_liste_commercant():
 #####################################################   Menu principal   #################################################################
 
 
-def menu_principal_inter():
-    test=1
 
 def menu_principal():
+    clear_window()
     fenetre.geometry("400x150")
     fenetre.title('Menu principal')
-    clear_window()
+    
 
 
     header_frame = tk.Frame(fenetre)
@@ -260,13 +261,18 @@ def menu_principal():
     password_frame.pack(pady=10)
 
     if password_compromise:
-        password_status = "[X] Votre mot de passe est compromis.\n[!] Aller dans la rubrique Profil pour changer votre mot de passe."
+        password_status = "[X] Votre mot de passe est compromis."
+        password_status2 = "[!] Aller dans la rubrique Profil pour changer votre mot de passe."
         label_password = tk.Label(password_frame, text=password_status, fg="red")
+        label_password2 = tk.Label(password_frame, text=password_status2, fg="orange")
+        label_password.pack()
+        label_password2.pack()
     else:
         password_status = "[✓] Votre mot de passe est sécurisé."
         label_password = tk.Label(password_frame, text=password_status, fg="green")
-
-    label_password.pack()
+        label_password.pack()
+    
+    
 
     button_frame = tk.Frame(fenetre)
     button_frame.pack(expand=True)
@@ -316,7 +322,7 @@ def change_password_inter():
     
     verif = modifier_password(username,entrée1_change,entrée2_change, fenetre)
     if verif :
-        fenetre.after(2000,menu_connexion)
+        fenetre.after(2000,menu_principal)
 
 def menu_change_password():
     global entrée1_change, entrée2_change
@@ -350,11 +356,15 @@ def menu_change_password():
 #####################################################   Menu verifier votre mot de passe   #################################################################
 
 def check_password_inter():
-    test=1
+    global fenetre, entrée1_check
+    
+    verif = haveibeenpwnd_password(entrée1_check, fenetre)
+    if verif :
+        fenetre.after(2000,menu_principal)
 
 
 def menu_check_password():
-    global entrée1_change, entrée2_change
+    global entrée1_check
     clear_window()
     fenetre.geometry("400x150")
     fenetre.title('Vérifier votre mod de passe')
@@ -384,10 +394,397 @@ def menu_check_password():
 
 
 def menu_produit():
-     test="test"
+    global username
+    fenetre.title('Gestion des produits')
+    fenetre.geometry("400x150")
+    clear_window()
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Gestion des produits :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+
+    button_frame = tk.Frame(fenetre)
+    button_frame.pack(expand=True)
+
+    button_frame2 = tk.Frame(fenetre)
+    button_frame2.pack(expand=True)
+
+    bouton1 = Button(button_frame,text = "Lire la liste",width=15, command=menu_lire_liste)
+    bouton1.pack(side=tk.LEFT, padx=10)
+    bouton2 = Button(button_frame,text = "Ajouter produit",width=15, command=menu_ajouter_produit)
+    bouton2.pack(side=tk.LEFT, padx=10) 
+    bouton3 = Button(button_frame,text = "Supprimer produit",width=15, command=menu_supprimer_produit)
+    bouton3.pack(side=tk.LEFT, padx=10)
+    bouton4 = Button(button_frame2,text = "Rechercher",width=15, command=menu_recherche_produit)
+    bouton4.pack(side=tk.LEFT, padx=10)
+    bouton5 = Button(button_frame2,text = "Trier",width=15, command=menu_trier_produit)
+    bouton5.pack(side=tk.LEFT, padx=10)
 
 
 
+#####################################################   lire liste   #################################################################
+
+def menu_lire_liste():
+    global produit
+    
+    fenetre.title('Lire la liste des produits')
+    fenetre.geometry("400x150")
+    clear_window()
+
+
+    chemin_fichier = recup_user()
+
+
+    liste=lire_liste(chemin_fichier)
+
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Lire la liste des produits :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    hauteur_fenetre = 100 + len(liste) * 30
+    fenetre.geometry(f"400x{hauteur_fenetre}")
+
+    frame_commercants = tk.Frame(fenetre)
+    frame_commercants.pack(fill=tk.BOTH, expand=True)
+
+
+    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+
+
+    tree.heading("NOM", text="Nom")
+    tree.heading("PRIX", text="Prix")
+    tree.heading("QUANTITE", text="Quantité")
+
+
+    tree.column("NOM", width=150)
+    tree.column("PRIX", width=100)
+    tree.column("QUANTITE", width=100, anchor="center")
+
+    tree["show"] = "headings"
+
+    for i, produit in enumerate(liste, start=1):
+        tree.insert("", "end", values=(produit))
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
+
+
+#####################################################   Ajouter produit   #################################################################
+
+def ajouter_produit_inter():
+    global entrée1, entrée2, entrée3
+    chemin_fichier=recup_user()
+    verif = ajouter_produit(chemin_fichier,entrée1, entrée2, entrée3,fenetre)
+    if verif :
+        fenetre.after(2000,menu_produit)
+
+
+def menu_ajouter_produit():
+
+    global entrée1, entrée2 , entrée3
+    clear_window()
+
+    
+
+    fenetre.geometry("400x150")
+    fenetre.title('Ajouter produit')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Ajouter un produit :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+
+    texte1 = Label(fenetre,text = "Nom : ")
+    texte1.place(x = 20, y = 40)
+    entrée1 = Entry(fenetre)
+    entrée1.place(x = 100, y = 40)
+    texte2 = Label(fenetre,text = "Prix : ")
+    texte2.place(x = 20, y = 62)
+    entrée2 = Entry(fenetre)
+    entrée2.place(x = 100, y = 62)
+    texte3 = Label(fenetre,text = "Quantité : ")
+    texte3.place(x = 20, y = 84)
+    entrée3 = Entry(fenetre)
+    entrée3.place(x = 100, y = 84)
+
+    bouton1 = Button(fenetre,text = "Ajouter",width=15, command=ajouter_produit_inter)
+    bouton1.place(x = 20, y = 110)
+
+
+
+#####################################################   Menu supprimer produit   #################################################################
+
+def supprimer_produit_inter():
+    global fenetre, entrée1_remove 
+    chemin_fichier= recup_user()
+    verif = supprimer_produit(chemin_fichier, entrée1_remove, fenetre)
+    if verif :
+        fenetre.after(2000,menu_produit)
+
+
+def menu_supprimer_produit():
+    global entrée1_remove
+    clear_window()
+    fenetre.geometry("400x150")
+    fenetre.title('Supprimer un produit')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Supprimer un produit :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Nom du produit : ")
+    texte1.place(x = 20, y = 50)
+    entrée1_remove = Entry(fenetre)
+    entrée1_remove.place(x = 150, y = 50)
+
+
+    bouton1 = Button(fenetre,text = "Supprimer",width=15, command=supprimer_produit_inter)
+    bouton1.place(x = 20, y = 110)
+
+
+
+
+
+#####################################################   Menu recherche produit  #################################################################
+
+def recherche_produit_inter():
+    global fenetre, entrée1
+    chemin_fichier= recup_user()
+    verif = rechercher_produit(chemin_fichier, entrée1, fenetre)
+    if verif :
+        fenetre.after(5000,menu_produit)
+
+
+def menu_recherche_produit():
+    global entrée1
+    clear_window()
+    fenetre.geometry("400x150")
+    fenetre.title('Rechercher un produit')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Rechercher un produit :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Nom du produit : ")
+    texte1.place(x = 20, y = 50)
+    entrée1 = Entry(fenetre)
+    entrée1.place(x = 150, y = 50)
+
+
+    bouton1 = Button(fenetre,text = "Rechercher",width=15, command=recherche_produit_inter)
+    bouton1.place(x = 20, y = 110)
+
+
+#####################################################   Menu trier produit  #################################################################
+
+def menu_trier_produit():
+    global username
+    fenetre.title('Trier les produits')
+    fenetre.geometry("400x150")
+    clear_window()
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Trier les produits :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+
+    button_frame = tk.Frame(fenetre)
+    button_frame.pack(expand=True)
+
+    button_frame2 = tk.Frame(fenetre)
+    button_frame2.pack(expand=True)
+
+    bouton1 = Button(button_frame,text = "Trier par nom",width=15, command=trier_nom)
+    bouton1.pack(side=tk.LEFT, padx=10)
+    bouton2 = Button(button_frame,text = "Trier par prix",width=15, command=trier_prix)
+    bouton2.pack(side=tk.LEFT, padx=10) 
+    bouton3 = Button(button_frame,text = "Trier par quantité",width=15, command=trier_quantite)
+    bouton3.pack(side=tk.LEFT, padx=10)
+
+
+def trier_nom():
+    global produit
+    
+    fenetre.title('Trier par nom')
+    fenetre.geometry("400x150")
+    clear_window()
+
+
+
+    chemin_fichier = recup_user()
+
+
+    liste=trier_produit_nom(chemin_fichier)
+
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    hauteur_fenetre = 100 + len(liste) * 30
+    fenetre.geometry(f"400x{hauteur_fenetre}")
+
+    frame_commercants = tk.Frame(fenetre)
+    frame_commercants.pack(fill=tk.BOTH, expand=True)
+
+
+    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+
+
+    tree.heading("NOM", text="Nom")
+    tree.heading("PRIX", text="Prix")
+    tree.heading("QUANTITE", text="Quantité")
+
+
+    tree.column("NOM", width=150)
+    tree.column("PRIX", width=100)
+    tree.column("QUANTITE", width=100, anchor="center")
+
+    tree["show"] = "headings"
+
+    for i, produit in enumerate(liste, start=1):
+        tree.insert("", "end", values=(produit))
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
+def trier_prix():
+    global produit
+    
+    fenetre.title('Trier par nom')
+    fenetre.geometry("400x150")
+    clear_window()
+
+
+
+    chemin_fichier = recup_user()
+
+
+    liste=trier_produit_prix(chemin_fichier)
+
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    hauteur_fenetre = 100 + len(liste) * 30
+    fenetre.geometry(f"400x{hauteur_fenetre}")
+
+    frame_commercants = tk.Frame(fenetre)
+    frame_commercants.pack(fill=tk.BOTH, expand=True)
+
+
+    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+
+
+    tree.heading("NOM", text="Nom")
+    tree.heading("PRIX", text="Prix")
+    tree.heading("QUANTITE", text="Quantité")
+
+
+    tree.column("NOM", width=150)
+    tree.column("PRIX", width=100)
+    tree.column("QUANTITE", width=100, anchor="center")
+
+    tree["show"] = "headings"
+
+    for i, produit in enumerate(liste, start=1):
+        tree.insert("", "end", values=(produit))
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
+
+
+def trier_quantite():
+    global produit
+    
+    fenetre.title('Trier par nom')
+    fenetre.geometry("400x150")
+    clear_window()
+
+
+
+    chemin_fichier = recup_user()
+
+
+    liste=trier_produit_quantite(chemin_fichier)
+
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    hauteur_fenetre = 100 + len(liste) * 30
+    fenetre.geometry(f"400x{hauteur_fenetre}")
+
+    frame_commercants = tk.Frame(fenetre)
+    frame_commercants.pack(fill=tk.BOTH, expand=True)
+
+
+    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+
+
+    tree.heading("NOM", text="Nom")
+    tree.heading("PRIX", text="Prix")
+    tree.heading("QUANTITE", text="Quantité")
+
+
+    tree.column("NOM", width=150)
+    tree.column("PRIX", width=100)
+    tree.column("QUANTITE", width=100, anchor="center")
+
+    tree["show"] = "headings"
+
+    for i, produit in enumerate(liste, start=1):
+        tree.insert("", "end", values=(produit))
+
+    tree.pack(fill=tk.BOTH, expand=True)
 
 
 
@@ -408,9 +805,12 @@ def clear_window():
                 widget.place_forget()
 
 
+def recup_user():
+    user= username.get()
+    nom_fichier = f"{user}.csv"
+    chemin_fichier = os.path.join('data', nom_fichier)
 
-
-
+    return chemin_fichier
 
 
 
