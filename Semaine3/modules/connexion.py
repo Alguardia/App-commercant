@@ -14,14 +14,14 @@ def generate_salt():
     return salt
     
 
-def register(entrée1_register,entrée2_register, fenetre):
+def register(entrée1_register,entrée2_register, entrée3_register , fenetre):
     type = 'register'
 
     username=entrée1_register.get()
     
     salt = generate_salt()
     password=entrée2_register.get()
-
+    email=entrée3_register.get()
     password_encode=password.encode("utf-8")
 
     if password_compromises(password):
@@ -51,7 +51,7 @@ def register(entrée1_register,entrée2_register, fenetre):
         else:
             df = pd.DataFrame(columns=['username', 'password', 'salt','email'])
 
-        user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex(),"zouki78@gmail.com"]]
+        user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex(),email]]
         df_new = pd.DataFrame(user_data, columns=['username', 'password', 'salt','email'])
         df_combined = pd.concat([df, df_new], ignore_index=True)
         df_combined.to_csv(user_csv_path, index=False)

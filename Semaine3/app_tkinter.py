@@ -7,17 +7,27 @@ from modules.gestion_compte import *
 from modules.profil import *
 from modules.admin import *
 from tkinter import ttk
-
+import tkinter.messagebox
+import os 
+from tkinter import ttk
 
 is_logged_in = False
 chemin_fichier=""
 password_compromise= False
-
+username = ''
 
 fenetre = tk.Tk()
 fenetre.geometry("400x150")
 fenetre.title('Menu Connexion')
 
+chemin_image = os.path.abspath('img/image2.png')
+
+image = PhotoImage(file=chemin_image)
+
+fenetre.iconphoto(False, image)
+
+
+fenetre.resizable(False, False)
 
 #####################################################   Menu connexion   #################################################################
 
@@ -28,10 +38,10 @@ def menu_connexion():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Menu de connexion :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Menu de connexion :", font=("Arial", 16, 'underline'),)
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
-    retour_button = tk.Button(header_frame, text="← Retour", command=menu_connexion)
+    retour_button = tk.Button(header_frame, text="← Quiter", command=fenetre.destroy)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
 
@@ -85,7 +95,7 @@ def menu_login():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Se connecter :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Se connecter :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_connexion)
@@ -109,16 +119,16 @@ def menu_login():
 
 
 def register_inter():
-    global fenetre, entrée1_register , entrée2_register 
+    global fenetre, entrée1_register , entrée2_register , entrée3_register
     
-    verif = register(entrée1_register,entrée2_register, fenetre)
+    verif = register(entrée1_register,entrée2_register, entrée3_register, fenetre)
     if verif :
         fenetre.after(2000,menu_connexion)
 
         
 def menu_register():
 
-    global entrée1_register, entrée2_register
+    global entrée1_register, entrée2_register , entrée3_register
     clear_window()
     fenetre.geometry("400x150")
     fenetre.title('Crée un compte')
@@ -126,20 +136,28 @@ def menu_register():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Crée un Compte :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Crée un Compte :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_connexion)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
     texte1 = Label(fenetre, text = "Nom d'utilisateur : ")
-    texte1.place(x = 20, y = 50)
+    texte1.place(x = 20, y = 40)
     entrée1_register = Entry(fenetre)
-    entrée1_register.place(x = 150, y = 50)
+    entrée1_register.place(x = 150, y = 40)
+    
+    texte3 = Label(fenetre,text = "Email : ")
+    texte3.place(x = 20, y = 65)
+    entrée3_register = Entry(fenetre)
+    entrée3_register.place(x = 150, y = 65)
+
+
     texte2 = Label(fenetre,text = "Mot de passe : ")
-    texte2.place(x = 20, y = 80)
+    texte2.place(x = 20, y = 90)
     entrée2_register = Entry(fenetre, show="*")
-    entrée2_register.place(x = 150, y = 80)
+    entrée2_register.place(x = 150, y = 90)
+
 
     bouton1 = Button(fenetre,text = "Crée un compte",width=15, command=register_inter)
     bouton1.place(x = 20, y = 110)
@@ -158,7 +176,7 @@ def menu_gestion_compte():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Gestion du compte :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Gestion du compte :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_connexion)
@@ -195,7 +213,7 @@ def menu_supprimer_utilisateur():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Supprimer un compte :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Supprimer un compte :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_gestion_compte)
@@ -225,7 +243,7 @@ def menu_liste_commercant():
     header_frame = tk.Frame(fenetre)
     header_frame.pack(fill=tk.X)
 
-    label_header = tk.Label(header_frame, text="Liste des commerçants :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Liste des commerçants :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_gestion_compte)
@@ -255,12 +273,12 @@ def menu_principal():
     clear_window()
     fenetre.geometry("400x150")
     fenetre.title('Menu principal')
-
+    
 
     header_frame = tk.Frame(fenetre)
     header_frame.pack(fill=tk.X)
 
-    label_header = tk.Label(header_frame, text="Menu principal :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text=f"Menu principal :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Déconnexion", command=menu_connexion)
@@ -288,8 +306,80 @@ def menu_principal():
 
     bouton1 = Button(button_frame, text="Profil", width=15, command=menu_profil)
     bouton1.pack(side=tk.LEFT, padx=10)
+
+
+    if username=='root':
+        bouton3 = Button(button_frame, text="Panel Admin", width=15, command=menu_admin)
+        bouton3.pack(side=tk.LEFT, padx=10 )
+
+
+
+
     bouton2 = Button(button_frame, text="Vos produits", width=15, command=menu_produit)
     bouton2.pack(side=tk.LEFT, padx=10)
+
+
+
+#####################################################   panel admin   #################################################################
+
+
+
+def menu_admin():
+        
+    fenetre.title('Panel Admin')
+    fenetre.geometry("800x150")
+    clear_window()
+
+
+    chemin_fichier = 'password/log.csv'
+
+    df = pd.read_csv(chemin_fichier)
+    df_sorted = df.sort_values(ascending=False,by="id")
+    liste = df_sorted.values.tolist()
+   
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Panel Admin :", font=("Arial", 16, 'underline'))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    hauteur_fenetre = len(liste)*20
+    hauteur_fenetre = min(hauteur_fenetre, 600)
+    fenetre.geometry(f"800x{hauteur_fenetre}")
+    
+
+    frame_commercants = tk.Frame(fenetre)
+    frame_commercants.pack(fill=tk.BOTH, expand=True)
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+    tree = ttk.Treeview(frame_commercants, columns=("id", "date", "time", "user", "processus", "details"), show='headings')
+    
+
+    tree.heading("id", text="ID")
+    tree.heading("date", text="Date")
+    tree.heading("time", text="Time")
+    tree.heading("user", text="User")
+    tree.heading("processus", text="Processus")
+    tree.heading("details", text="Details")
+
+
+    tree.column("id", width=10)
+    tree.column("date", width=10)
+    tree.column("time", width=10)
+    tree.column("user", width=10)
+    tree.column("processus", width=10)
+    tree.column("details", width=200)
+
+    
+    for i, produit in enumerate(liste, start=1):
+        tree.insert("", "end", values=(produit))
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
 
 
 
@@ -302,11 +392,11 @@ def menu_profil():
     fenetre.geometry("400x150")
     fenetre.title('Profil')
     clear_window()
-
+    
     header_frame = tk.Frame(fenetre)
     header_frame.pack(fill=tk.X)
 
-    label_header = tk.Label(header_frame, text="Votre Profil :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Votre Profil :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
@@ -315,11 +405,14 @@ def menu_profil():
     button_frame = tk.Frame(fenetre)
     button_frame.place(relx=0.5, rely=0.5, anchor='center')
 
+
+
+
     bouton1 = Button(button_frame, text="Modifier votre mot de passe", width=25, command=menu_change_password)
     bouton1.pack(side=tk.LEFT, padx=10)
     bouton2 = Button(button_frame, text="Vérifier votre mot de passe", width=25, command=menu_check_password)
     bouton2.pack(side=tk.LEFT, padx=10)
-
+    
 
 
 
@@ -343,7 +436,7 @@ def menu_change_password():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Modifier votre mot de passe :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Modifier votre mot de passe :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
@@ -367,8 +460,8 @@ def menu_change_password():
 
 def check_password_inter():
     global fenetre, entrée1_check
-    
-    verif = haveibeenpwnd_password_check(entrée1_check, fenetre)
+
+    verif = haveibeenpwnd_password_check(entrée1_check, fenetre,username)
     if verif :
         fenetre.after(2000,menu_principal)
 
@@ -382,7 +475,7 @@ def menu_check_password():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Vérifier votre mot de passe :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Vérifier votre mot de passe :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
@@ -390,7 +483,7 @@ def menu_check_password():
 
     texte1 = Label(fenetre, text = "Mot de passe : ")
     texte1.place(x = 20, y = 50)
-    entrée1_check = Entry(fenetre)
+    entrée1_check = Entry(fenetre,  show='*')
     entrée1_check.place(x = 150, y = 50)
 
     bouton1 = Button(fenetre,text = "Vérifier",width=15, command=check_password_inter)
@@ -412,7 +505,7 @@ def menu_produit():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Gestion des produits :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Gestion des produits :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
@@ -457,20 +550,21 @@ def menu_lire_liste():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Lire la liste des produits :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Lire la liste des produits :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
-    hauteur_fenetre = 100 + len(liste) * 30
+    hauteur_fenetre = 100 + len(liste) * 20
     fenetre.geometry(f"400x{hauteur_fenetre}")
 
     frame_commercants = tk.Frame(fenetre)
     frame_commercants.pack(fill=tk.BOTH, expand=True)
 
-
-    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+    tree = ttk.Treeview(frame_commercants, columns=("NOM", "PRIX", "QUANTITE"))
 
 
     tree.heading("NOM", text="Nom")
@@ -514,7 +608,7 @@ def menu_ajouter_produit():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Ajouter un produit :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Ajouter un produit :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
@@ -558,7 +652,7 @@ def menu_supprimer_produit():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Supprimer un produit :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Supprimer un produit :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
@@ -596,7 +690,7 @@ def menu_recherche_produit():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Rechercher un produit :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Rechercher un produit :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
@@ -623,7 +717,7 @@ def menu_trier_produit():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Trier les produits :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Trier les produits :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
@@ -660,20 +754,21 @@ def trier_nom():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
-    hauteur_fenetre = 100 + len(liste) * 30
+    hauteur_fenetre = 100 + len(liste) * 20
     fenetre.geometry(f"400x{hauteur_fenetre}")
 
     frame_commercants = tk.Frame(fenetre)
     frame_commercants.pack(fill=tk.BOTH, expand=True)
 
-
-    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+    tree = ttk.Treeview(frame_commercants, columns=("NOM", "PRIX", "QUANTITE"))
 
 
     tree.heading("NOM", text="Nom")
@@ -710,20 +805,21 @@ def trier_prix():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
-    hauteur_fenetre = 100 + len(liste) * 30
+    hauteur_fenetre = 100 + len(liste) * 20
     fenetre.geometry(f"400x{hauteur_fenetre}")
 
     frame_commercants = tk.Frame(fenetre)
     frame_commercants.pack(fill=tk.BOTH, expand=True)
 
-
-    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+    tree = ttk.Treeview(frame_commercants, columns=("NOM", "PRIX", "QUANTITE"))
 
 
     tree.heading("NOM", text="Nom")
@@ -762,20 +858,21 @@ def trier_quantite():
     header_frame.pack(fill=tk.X)
 
 
-    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16))
+    label_header = tk.Label(header_frame, text="Trier par nom :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
     retour_button = tk.Button(header_frame, text="← Retour", command=menu_produit)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
-    hauteur_fenetre = 100 + len(liste) * 30
+    hauteur_fenetre = 100 + len(liste) * 20
     fenetre.geometry(f"400x{hauteur_fenetre}")
 
     frame_commercants = tk.Frame(fenetre)
     frame_commercants.pack(fill=tk.BOTH, expand=True)
 
-
-    tree = ttk.Treeview(fenetre, columns=("NOM", "PRIX", "QUANTITE"))
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+    tree = ttk.Treeview(frame_commercants, columns=("NOM", "PRIX", "QUANTITE"))
 
 
     tree.heading("NOM", text="Nom")
@@ -814,17 +911,31 @@ def clear_window():
 
 
 def recup_user():
-    user= username.get()
-    nom_fichier = f"{user}.csv"
+    
+    nom_fichier = f"{username}.csv"
     chemin_fichier = os.path.join('data', nom_fichier)
 
     return chemin_fichier
 
 
+def callback():
+    type = 'exit'
+    if username !='': 
+        status = f"[X] {username} a quitter l'application"
+    else :
+         status = f"[X] L'utilisateur a quitter l'application"
+    add_log(type,username,status)
+    fenetre.destroy()
 
 
 
 
+
+
+
+
+
+fenetre.protocol("WM_DELETE_WINDOW", callback)
 menu_connexion()
 
 fenetre.mainloop()

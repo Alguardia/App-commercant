@@ -4,9 +4,11 @@ import hashlib
 from modules.connexion import haveibeenpwnd_password
 import requests
 import tkinter as tk
+from modules.log import *
+
 
 def modifier_password(username, entrée1_change,entrée2_change,fenetre):
-    
+    type = 'change_password'
     
     old_password = entrée1_change.get()
     password = entrée2_change.get()
@@ -32,10 +34,10 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
 
     if verif:
 
-        password_status = f"[✓] Mot de passe changé."
-        label_password = tk.Label(fenetre, text=password_status, fg="green")
+        status = f"[✓] Mot de passe changé."
+        label_password = tk.Label(fenetre, text=status, fg="green")
         label_password.place(x=150, y=110)
-
+        add_log(type,username,status)
         filtered_df = df.loc[df['username'] == username]
         salt = bytes.fromhex(filtered_df['salt'].values[0])
         nouveau_password_combined = password.encode("utf-8") + salt
@@ -50,15 +52,19 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
 
         return True
     else :
-        password_status = "[X] Mauvais mot de passe."
-        label_password = tk.Label(fenetre, text=password_status, fg="red")
+        status = "[X] Mauvais mot de passe."
+        label_password = tk.Label(fenetre, text=status, fg="red")
         label_password.place(x=150, y=110)
+        add_log(type,username,status)
 
 
 
-def haveibeenpwnd_password_check(entrée_check,fenetre):
+def haveibeenpwnd_password_check(entrée_check,fenetre,username):
+    
+   
     csv_path = 'password/log.csv'
     df = pd.read_csv(csv_path)
+    type = 'check_password'
     
     password = entrée_check.get()
     password = password.encode("utf-8")
@@ -83,21 +89,23 @@ def haveibeenpwnd_password_check(entrée_check,fenetre):
         else:
             pwnded_password = 0
 
-        new_entry = pd.DataFrame({'password': [password.decode('utf-8')], 'number': [pwnded_password]})
-        df = pd.concat([df, new_entry], ignore_index=True)
-        df.to_csv(csv_path, index=False)
 
         if pwnded_password > 0:
-            password_status = f"[X] Votre mot de passe est compromis {pwnded_password} fois."
-            label_password = tk.Label(fenetre, text=password_status, fg="red", wraplength=230)
+            status = f"[X] Le mot de passe est compromis {pwnded_password} fois."
+            label_password = tk.Label(fenetre, text=status, fg="red", wraplength=210)
             label_password.place(x=150, y=90)
+            add_log(type,username,status)
+            return
 
         else:
-            password_status = f"[✓] Votre mot de passe n'a pas été compromis."
-            label_password = tk.Label(fenetre, text=password_status, fg="green")
+            status = f"[✓] Votre mot de passe n'a pas été compromis."
+            label_password = tk.Label(fenetre, text=status, fg="green" ,wraplength=230)
             label_password.place(x=150, y=90)
-
+            add_log(type,username,status)
+            return
     else:
-        password_status = f"[!] Erreur lors de la vérification du mot de passe."
-        label_password = tk.Label(fenetre, text=password_status, fg="yellow")
+        status = f"[!] Erreur lors de la vérification du mot de passe."
+        label_password = tk.Label(fenetre, text=status, fg="yellow" ,wraplength=230)
         label_password.place(x=150, y=90)
+        add_log(type,username,status)
+        return 

@@ -16,7 +16,7 @@ def add_log(type, username, status):
         last_id = df['id'].max()  
 
 
-    new_id = last_id + 1
+    new_id = int (last_id + 1)
     log_entry = {
         'id': new_id,
         'date': date,
