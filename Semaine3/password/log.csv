@@ -1,0 +1,11 @@
+id,date,time,user,processus,details
+1,09/01/2025,12:46:49,root,login,[✓] Connexion réusite.
+2,09/01/2025,12:48:14,test,register,[✓] Utilisateur test enregistré avec succès.
+3,09/01/2025,12:48:25,test,register,[X] Changer de mot de passe.
+4,09/01/2025,12:49:22,test,register,[X] Cette utilisateur existe déjà.
+5,09/01/2025,12:49:39,test,login,[✓] Connexion réusite.
+6,09/01/2025,13:26:32,test,delete_user,[✓] Utilisateur test supprimé avec succès.
+7,09/01/2025,13:28:12,test,register,[✓] Utilisateur test enregistré avec succès.
+8,09/01/2025,13:28:21,test,delete_user,[✓] Utilisateur test supprimé avec succès.
+9,09/01/2025,13:29:30,a,register,[✓] Utilisateur a enregistré avec succès.
+10,09/01/2025,13:30:45,a,delete_user,[✓] Utilisateur a supprimé avec succès.

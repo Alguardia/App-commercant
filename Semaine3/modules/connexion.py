@@ -3,6 +3,10 @@ import pandas as pd
 import hashlib
 import requests 
 import tkinter as tk
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from modules.log import *
 
 
 def generate_salt():
@@ -11,8 +15,7 @@ def generate_salt():
     
 
 def register(entrée1_register,entrée2_register, fenetre):
-    password_check=False
-    username_check=False
+    type = 'register'
 
     username=entrée1_register.get()
     
@@ -21,11 +24,12 @@ def register(entrée1_register,entrée2_register, fenetre):
 
     password_encode=password.encode("utf-8")
 
-    if haveibeenpwnd_password(password_encode):
+    if password_compromises(password):
         
-        password_status = "[X] Changer de mot de passe."
-        label_password = tk.Label(fenetre, text=password_status, fg="red")
+        status = "[X] Changer de mot de passe."
+        label_password = tk.Label(fenetre, text=status, fg="red")
         label_password.place(x=150, y=110)
+        add_log(type,username,status)
         return False
         
     else :
@@ -39,21 +43,23 @@ def register(entrée1_register,entrée2_register, fenetre):
             df = pd.read_csv(user_csv_path)
 
             if username in df['username'].values:
-                username_status = "[X] Cette utilisateur existe déjà."
-                label_username = tk.Label(fenetre, text=username_status, fg="red")
+                status = "[X] Cette utilisateur existe déjà."
+                label_username = tk.Label(fenetre, text=status, fg="red")
                 label_username.place(x=150, y=110)
+                add_log(type,username,status)
                 return False
         else:
-            df = pd.DataFrame(columns=['username', 'password', 'salt'])
+            df = pd.DataFrame(columns=['username', 'password', 'salt','email'])
 
-        user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex()]]
-        df_new = pd.DataFrame(user_data, columns=['username', 'password', 'salt'])
+        user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex(),"zouki78@gmail.com"]]
+        df_new = pd.DataFrame(user_data, columns=['username', 'password', 'salt','email'])
         df_combined = pd.concat([df, df_new], ignore_index=True)
         df_combined.to_csv(user_csv_path, index=False)
 
-        password_status = f"[✓] Utilisateur {username} enregistré avec succès."
-        label_password = tk.Label(fenetre, text=password_status, fg="green")
+        status = f"[✓] Utilisateur {username} enregistré avec succès."
+        label_password = tk.Label(fenetre, text=status, fg="green")
         label_password.place(x=150, y=110)
+        add_log(type,username,status)
 
         df_produit = pd.DataFrame(columns=['NOM', 'PRIX', 'QUANTITE'])
         df_produit.to_csv(chemin_fichier, index=False)
@@ -83,17 +89,25 @@ def verifier_utilisateur(username, password):
 
 
 def login(entrée1,entrée2,fenetre):
+    type = 'login'
     username=entrée1.get()
     password=entrée2.get()
     if verifier_utilisateur(username, password):
+        
         status = "[✓] Connexion réusite."
         label_username = tk.Label(fenetre, text=status, fg="green")
         label_username.place(x=150, y=110)
+
+        add_log(type,username,status)
+
         return True
     else:
         status = "[X] Connexion refusée."
         label_username = tk.Label(fenetre, text=status, fg="red")
         label_username.place(x=150, y=110)
+
+        add_log(type,username,status)
+
         return False
 
 
@@ -109,10 +123,9 @@ def password_compromises(password):
 
 
     if password_hash in df['Hashed'].values:
-        print(f". Hash trouvé: {password_hash}")
         password_is_compromise = True
-    else:
-        print(f"Le mot de passe n'est pas compromis. Hash non trouvé.")
+
+
     
     return password_is_compromise
 
@@ -120,9 +133,11 @@ def password_compromises(password):
 
 
 def haveibeenpwnd_password(password):
-    csv_path = 'password/password_verif.csv'
-    df = pd.read_csv(csv_path)
-    password_hashed = hashlib.sha1(password).hexdigest()
+    password_is_compromise = False
+    password_encode=password.encode("utf-8")
+    
+    
+    password_hashed = hashlib.sha1(password_encode).hexdigest()
     char = password_hashed[:5]
 
     response = requests.get(f"https://api.pwnedpasswords.com/range/{char}")
@@ -143,12 +158,11 @@ def haveibeenpwnd_password(password):
         else:
             pwnded_password = 0
 
-        new_entry = pd.DataFrame({'password': [password.decode('utf-8')], 'number': [pwnded_password]})
-        df = pd.concat([df, new_entry], ignore_index=True)
-        df.to_csv(csv_path, index=False)
+       
 
         if pwnded_password > 0:
-            return True
+            password_is_compromise = True
+            return password_is_compromise
         else:
             return False
     else:
@@ -156,3 +170,48 @@ def haveibeenpwnd_password(password):
         input("Appuyez sur une touche pour continuer...")
 
         return False
+    
+def envoyer_email(email):
+
+    serveur = 'smtp.gmail.com'
+    port = 465
+    email_expediteur = 't84089972@gmail.com'
+    mdp_expediteur = 'wkibkccwhvllbzsy'
+    msg = MIMEMultipart()
+    msg['From'] = email_expediteur
+    msg['To'] = email
+    msg['Subject'] = 'Réinitialisation de mot de passe'
+    msg.attach(MIMEText('Votre mot de passe est compromis dépêchez vous de le changer !', 'plain'))
+ 
+    try:
+        serveur_smtp = smtplib.SMTP_SSL(serveur, port)
+        serveur_smtp.login(email_expediteur, mdp_expediteur)
+        texte = msg.as_string()
+        serveur_smtp.sendmail(email_expediteur, email, texte)
+        serveur_smtp.quit()
+
+    except Exception as e:
+        print("Erreur lors de l'envoi du courriel: " + str(e))
+        return False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

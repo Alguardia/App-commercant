@@ -1,16 +1,15 @@
 import os
 import pandas as pd
 import hashlib
-from modules.connexion import password_compromises
+from modules.connexion import haveibeenpwnd_password
 import requests
 import tkinter as tk
 
 def modifier_password(username, entrée1_change,entrée2_change,fenetre):
-    global password_compromise
     
-    username = username.get()
+    
     old_password = entrée1_change.get()
-    nouveau_password = entrée2_change.get()
+    password = entrée2_change.get()
     
 
     user_csv_path = 'data/user.csv'
@@ -39,7 +38,7 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
 
         filtered_df = df.loc[df['username'] == username]
         salt = bytes.fromhex(filtered_df['salt'].values[0])
-        nouveau_password_combined = nouveau_password.encode("utf-8") + salt
+        nouveau_password_combined = password.encode("utf-8") + salt
         nouveau_password_hashed = hashlib.sha256(nouveau_password_combined).hexdigest()
 
         df.loc[df['username'] == username, 'password'] = nouveau_password_hashed
@@ -47,9 +46,9 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
             
         df.to_csv(user_csv_path, index=False)
 
-        password_compromise = password_compromises(nouveau_password)
+        
 
-        return True ,password_compromise
+        return True
     else :
         password_status = "[X] Mauvais mot de passe."
         label_password = tk.Label(fenetre, text=password_status, fg="red")
@@ -57,8 +56,8 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
 
 
 
-def haveibeenpwnd_password(entrée_check,fenetre):
-    csv_path = 'password/password_verif.csv'
+def haveibeenpwnd_password_check(entrée_check,fenetre):
+    csv_path = 'password/log.csv'
     df = pd.read_csv(csv_path)
     
     password = entrée_check.get()

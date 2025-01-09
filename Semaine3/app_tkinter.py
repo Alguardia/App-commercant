@@ -36,7 +36,7 @@ def menu_connexion():
 
 
     button_frame = tk.Frame(fenetre)
-    button_frame.pack(expand=True)
+    button_frame.place(relx=0.5, rely=0.5, anchor='center')
 
     bouton1 = Button(button_frame,text = "Se connecter",width=15, command=menu_login)
     bouton1.pack(side=tk.LEFT, padx=10)
@@ -57,11 +57,20 @@ def menu_connexion():
 
 
 def login_inter():
-    global password_compromise ,username
-    username=entrée1
+    global password_compromise ,username , password
+    username=entrée1.get()
+    password=entrée2.get()
     if login(entrée1, entrée2,fenetre):
-                password=entrée2.get()
-                password_compromise = password_compromises(password)
+                password_compromise = haveibeenpwnd_password(password)
+                
+                if password_compromise:
+                    df = pd.read_csv('data/user.csv')
+                    user_row = df[df['username'] == username]
+            
+                    if not user_row.empty:
+                        email = user_row['email'].iloc[0]
+                        envoyer_email(email)
+                
                 fenetre.after(2000,menu_principal)
     
 
@@ -157,7 +166,7 @@ def menu_gestion_compte():
 
 
     button_frame = tk.Frame(fenetre)
-    button_frame.pack(expand=True)
+    button_frame.place(relx=0.5, rely=0.5, anchor='center')
 
     bouton1 = Button(button_frame,text = "Supprimer compte", width=15, command=menu_supprimer_utilisateur)
     bouton1.pack(side=tk.LEFT, padx=10)
@@ -242,10 +251,10 @@ def menu_liste_commercant():
 
 
 def menu_principal():
+    global password_compromise
     clear_window()
     fenetre.geometry("400x150")
     fenetre.title('Menu principal')
-    
 
 
     header_frame = tk.Frame(fenetre)
@@ -304,7 +313,7 @@ def menu_profil():
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
     button_frame = tk.Frame(fenetre)
-    button_frame.pack(expand=True)
+    button_frame.place(relx=0.5, rely=0.5, anchor='center')
 
     bouton1 = Button(button_frame, text="Modifier votre mot de passe", width=25, command=menu_change_password)
     bouton1.pack(side=tk.LEFT, padx=10)
@@ -318,9 +327,10 @@ def menu_profil():
 #####################################################   Menu modifier mot de passe   #################################################################
 
 def change_password_inter():
-    global fenetre, entrée1_change , entrée2_change
+    global fenetre, entrée1_change , entrée2_change , password_compromise
     
     verif = modifier_password(username,entrée1_change,entrée2_change, fenetre)
+    password_compromise = haveibeenpwnd_password(entrée2_change.get())
     if verif :
         fenetre.after(2000,menu_principal)
 
@@ -358,7 +368,7 @@ def menu_change_password():
 def check_password_inter():
     global fenetre, entrée1_check
     
-    verif = haveibeenpwnd_password(entrée1_check, fenetre)
+    verif = haveibeenpwnd_password_check(entrée1_check, fenetre)
     if verif :
         fenetre.after(2000,menu_principal)
 
@@ -621,10 +631,8 @@ def menu_trier_produit():
 
 
     button_frame = tk.Frame(fenetre)
-    button_frame.pack(expand=True)
+    button_frame.place(relx=0.5, rely=0.5, anchor='center')
 
-    button_frame2 = tk.Frame(fenetre)
-    button_frame2.pack(expand=True)
 
     bouton1 = Button(button_frame,text = "Trier par nom",width=15, command=trier_nom)
     bouton1.pack(side=tk.LEFT, padx=10)
