@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-log_file_path = 'password/log.csv'
+log_file_path = 'security/log.csv'
 
 
 def add_log(type, username, status):

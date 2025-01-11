@@ -5,7 +5,6 @@ from modules.produits import *
 from modules.connexion import *
 from modules.gestion_compte import *
 from modules.profil import *
-from modules.admin import *
 from tkinter import ttk
 import tkinter.messagebox
 import os 
@@ -74,12 +73,8 @@ def login_inter():
                 password_compromise = haveibeenpwnd_password(password)
                 
                 if password_compromise:
-                    df = pd.read_csv('data/user.csv')
-                    user_row = df[df['username'] == username]
-            
-                    if not user_row.empty:
-                        email = user_row['email'].iloc[0]
-                        envoyer_email(email)
+                        email= recup_email()
+                        envoyer_email(email, 'login', NONE)
                 
                 fenetre.after(2000,menu_principal)
     
@@ -120,10 +115,42 @@ def menu_login():
 
 def register_inter():
     global fenetre, entrée1_register , entrée2_register , entrée3_register
-    
-    verif = register(entrée1_register,entrée2_register, entrée3_register, fenetre)
+    register(entrée1_register,entrée2_register, entrée3_register, fenetre)
+    menu_verif_email(entrée3_register,fenetre)
+
+def verif_email_inter():
+    global fenetre, code, entrée1_mail
+    verif = verif_email(entrée1_mail,code,fenetre)
+    print(1)
     if verif :
         fenetre.after(2000,menu_connexion)
+
+def menu_verif_email(entrée3_register,fenetre):
+    global code, entrée1_mail
+    code = random.randint(1000, 9999)
+    email = entrée3_register.get()
+
+    clear_window()
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+    envoyer_email(email,'check_register',code)
+
+    label_header = tk.Label(header_frame, text="Verifier votre adresse mail :", font=("Arial", 16, 'underline'))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_connexion)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Code reçu par mail : ")
+    texte1.place(x = 20, y = 40)
+    entrée1_mail = Entry(fenetre)
+    entrée1_mail.place(x = 150, y = 40)
+    
+    bouton1 = Button(fenetre,text = "Valider",width=15, command=verif_email_inter)
+    bouton1.place(x = 20, y = 110)
+    bouton2 = Button(fenetre,text = "Renvoyer un email",width=15, command=lambda: envoyer_email(email,'check_register',code))
+    bouton2.place(x = 150, y = 110)
+
 
         
 def menu_register():
@@ -134,7 +161,7 @@ def menu_register():
     fenetre.title('Crée un compte')
     header_frame = tk.Frame(fenetre)
     header_frame.pack(fill=tk.X)
-
+ 
 
     label_header = tk.Label(header_frame, text="Crée un Compte :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
@@ -188,10 +215,12 @@ def menu_gestion_compte():
 
     bouton1 = Button(button_frame,text = "Supprimer compte", width=15, command=menu_supprimer_utilisateur)
     bouton1.pack(side=tk.LEFT, padx=10)
-    bouton2 = Button(button_frame,text = "Liste commercants", width=15, command=menu_liste_commercant)
-    bouton2.pack(side=tk.LEFT, padx=10) 
+    bouton2 = Button(button_frame,text = "Recupération compte", width=18, command=menu_recuperation_compte)
+    bouton2.pack(side=tk.LEFT, padx=5)
+    bouton3 = Button(button_frame,text = "Liste commercants", width=15, command=menu_liste_commercant)
+    bouton3.pack(side=tk.LEFT, padx=10) 
 
-    
+
 
 
 
@@ -233,6 +262,108 @@ def menu_supprimer_utilisateur():
 
 
 
+#####################################################   Menu recuperation utilisateur   #################################################################
+
+def recuperation_compte_mdp_inter():
+    if recuperation_compte(entrée1,email,fenetre):
+        fenetre.after(2000,menu_connexion)
+
+def menu_recuperation_compte_mdp():
+    global entrée1
+    clear_window()
+    fenetre.geometry("400x150")
+    fenetre.title('Recupérer votre compte')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Recupérer votre compte :", font=("Arial", 16, 'underline'))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_gestion_compte)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Nouveau mot de passe : ")
+    texte1.place(x = 20, y = 50)
+    entrée1 = Entry(fenetre, show='*')
+    entrée1.place(x = 150, y = 50)
+
+    bouton1 = Button(fenetre,text = "Recupérer",width=15, command=recuperation_compte_mdp_inter)
+    bouton1.place(x = 20, y = 110)
+
+def menu_recupetation_compte_code_inter():
+    global entrée1,code
+    
+    code_email = int(entrée1.get())
+    if code == code_email:
+        menu_recuperation_compte_mdp()
+
+def menu_recuperation_compte_code():
+
+    global entrée1,code, email
+    email = entrée1.get()
+    type = 'email_recover'
+    user_csv_path = 'data/user.csv'
+    df = pd.read_csv(user_csv_path)
+
+
+    filtered_df = df.loc[df['email'] == email]
+    if filtered_df.empty:
+        status = f"[X] Cet email n'existe pas."
+        label_password = tk.Label(fenetre, text=status, fg="red")
+        label_password.place(x=150, y=110)
+        add_log(type,email,status)
+        return False
+    code = random.randint(1000, 9999)
+    envoyer_email(email, 'password_recovery',code)
+    clear_window()
+    fenetre.geometry("400x150")
+    fenetre.title('Recupérer votre compte')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Recupérer votre compte :", font=("Arial", 16, 'underline'))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_gestion_compte)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Code : ")
+    texte1.place(x = 20, y = 50)
+    entrée1 = Entry(fenetre)
+    entrée1.place(x = 150, y = 50)
+
+    bouton1 = Button(fenetre,text = "Recupérer",width=15, command=menu_recupetation_compte_code_inter)
+    bouton1.place(x = 20, y = 110)
+
+    
+
+
+def menu_recuperation_compte():
+    global entrée1
+    clear_window()
+    fenetre.geometry("400x150")
+    fenetre.title('Recupérer votre compte')
+    header_frame = tk.Frame(fenetre)
+    header_frame.pack(fill=tk.X)
+
+
+    label_header = tk.Label(header_frame, text="Recupérer votre compte :", font=("Arial", 16, 'underline'))
+    label_header.pack(side=tk.LEFT, pady=10, padx=10)
+
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_gestion_compte)
+    retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
+
+    texte1 = Label(fenetre, text = "Email : ")
+    texte1.place(x = 20, y = 50)
+    entrée1 = Entry(fenetre)
+    entrée1.place(x = 150, y = 50)
+
+    bouton1 = Button(fenetre,text = "Recupérer",width=15, command=menu_recuperation_compte_code)
+    bouton1.place(x = 20, y = 110)
+
+
 
 #####################################################   Menu liste des commercants   #################################################################
 
@@ -266,8 +397,11 @@ def menu_liste_commercant():
 
 #####################################################   Menu principal   #################################################################
 
-
-
+def menu_principal_inter():
+    type ='disconnect'
+    status=f"[!] {username} s'est déconnecter"
+    add_log(type,username,status)
+    menu_connexion()
 def menu_principal():
     global password_compromise
     clear_window()
@@ -281,7 +415,7 @@ def menu_principal():
     label_header = tk.Label(header_frame, text=f"Menu principal :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
-    retour_button = tk.Button(header_frame, text="← Déconnexion", command=menu_connexion)
+    retour_button = tk.Button(header_frame, text="← Déconnexion", command=menu_principal_inter)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
     password_frame = tk.Frame(fenetre)
@@ -331,7 +465,7 @@ def menu_admin():
     clear_window()
 
 
-    chemin_fichier = 'password/log.csv'
+    chemin_fichier = 'security/log.csv'
 
     df = pd.read_csv(chemin_fichier)
     df_sorted = df.sort_values(ascending=False,by="id")
@@ -420,11 +554,13 @@ def menu_profil():
 #####################################################   Menu modifier mot de passe   #################################################################
 
 def change_password_inter():
-    global fenetre, entrée1_change , entrée2_change , password_compromise
-    
-    verif = modifier_password(username,entrée1_change,entrée2_change, fenetre)
+    global fenetre, entrée1_change , entrée2_change , password_compromise , email , code
+    email = recup_email()
+    verif = modifier_password(username,entrée1_change,entrée2_change, fenetre, email)
     password_compromise = haveibeenpwnd_password(entrée2_change.get())
     if verif :
+        
+        envoyer_email(email, 'password_changed', NONE)
         fenetre.after(2000,menu_principal)
 
 def menu_change_password():
@@ -439,7 +575,7 @@ def menu_change_password():
     label_header = tk.Label(header_frame, text="Modifier votre mot de passe :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
-    retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_profil)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
 
@@ -478,7 +614,7 @@ def menu_check_password():
     label_header = tk.Label(header_frame, text="Vérifier votre mot de passe :", font=("Arial", 16, 'underline'))
     label_header.pack(side=tk.LEFT, pady=10, padx=10)
 
-    retour_button = tk.Button(header_frame, text="← Retour", command=menu_principal)
+    retour_button = tk.Button(header_frame, text="← Retour", command=menu_profil)
     retour_button.pack(side=tk.RIGHT, pady=10, padx=10)
 
     texte1 = Label(fenetre, text = "Mot de passe : ")
@@ -929,8 +1065,14 @@ def callback():
 
 
 
+def recup_email():
 
-
+    df = pd.read_csv('data/user.csv')
+    user_row = df[df['username'] == username]
+            
+    if not user_row.empty:
+        email = user_row['email'].iloc[0]
+    return email
 
 
 

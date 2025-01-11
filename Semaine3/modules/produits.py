@@ -56,12 +56,12 @@ def supprimer_produit(chemin_fichier, entrée1_remove, fenetre):
     if len(filtered_df) < len(df):
         filtered_df.to_csv(chemin_fichier, index=False)
         status = "[✓] Produit supprimé avec succès"
-        label_produit = tk.Label(fenetre, text=status, fg="green")
+        label_produit = tk.Label(fenetre, text=status, fg="green", wraplength=170 )
         label_produit.place(x=150, y=110)
         return True
     else:
         status = f"[X] Aucun élement trouvé pour {input_recherche}"
-        label_produit = tk.Label(fenetre, text=status, fg="red")
+        label_produit = tk.Label(fenetre, text=status, fg="red", wraplength=160)
         label_produit.place(x=150, y=110)
         return False
 
@@ -77,7 +77,7 @@ def rechercher_produit(chemin_fichier, entrée1_remove, fenetre):
     df = pd.read_csv(chemin_fichier)
 
     filtered_df = df.loc[(df['NOM'] == input_recherche.lower())]
-    print(filtered_df)
+    
     if filtered_df.empty: 
         status = f"[X] Aucun élement trouvé pour {input_recherche}"
         label_produit = tk.Label(fenetre, text=status, fg="red")
@@ -85,7 +85,11 @@ def rechercher_produit(chemin_fichier, entrée1_remove, fenetre):
         return False
     
     else: 
-        status = f"{filtered_df}"
+        nom = filtered_df.iloc[0]['NOM']
+        prix = filtered_df.iloc[0]['PRIX']
+        quantite = filtered_df.iloc[0]['QUANTITE']
+        
+        status = f"Nom: {nom} | Prix: {prix} | Quantité: {quantite}"
         label_produit = tk.Label(fenetre, text=status, fg="green")
         label_produit.place(x=150, y=110)
         return True

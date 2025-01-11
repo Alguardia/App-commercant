@@ -3,18 +3,59 @@ import pandas as pd
 import hashlib
 import requests 
 import tkinter as tk
+from tkinter import *
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from modules.log import *
-
+import random
 
 def generate_salt():
     salt = os.urandom(16)
     return salt
+ 
+
+def verif_email(entrée1_mail, code,fenetre):
+    try:
+        code_email = int(entrée1_mail.get())
+        if code_email == code:
+            save_user(fenetre)
+            return True
+        else:
+            status = f"[X] Code reçu par mail invalide"
+            label_password = tk.Label(fenetre, text=status, fg="red")
+            label_password.pack(pady=(20, 0), anchor='center')
+            add_log("register", username, status)
+            return False
+    except ValueError:
+        status = "[X] Entrée invalide, veuillez entrer un code numérique."
+        label_password = tk.Label(fenetre, text=status, fg="red")
+        label_password.pack(pady=(20, 0), anchor='center') 
+        add_log("register", username, status)
+        return False
+
+
+def save_user(fenetre):
+    user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex(),email]]
+    df_new = pd.DataFrame(user_data, columns=['username', 'password', 'salt','email'])
+    df_combined = pd.concat([df, df_new], ignore_index=True)
+    df_combined.to_csv(user_csv_path, index=False)
+
+    status = f"[✓] Utilisateur {username} enregistré avec succès."
+    label_password = tk.Label(fenetre, text=status, fg="green")
+    label_password.pack(pady=(20, 0), anchor='center')
+    add_log("register",username,status)
+
+    df_produit = pd.DataFrame(columns=['NOM', 'PRIX', 'QUANTITE'])
+    df_produit.to_csv(chemin_fichier, index=False)
     
+    return True
+
+
 
 def register(entrée1_register,entrée2_register, entrée3_register , fenetre):
+    global username,password,salt,email,chemin_fichier,user_csv_path,df
+    verif = False
     type = 'register'
 
     username=entrée1_register.get()
@@ -48,23 +89,17 @@ def register(entrée1_register,entrée2_register, entrée3_register , fenetre):
                 label_username.place(x=150, y=110)
                 add_log(type,username,status)
                 return False
+            
         else:
             df = pd.DataFrame(columns=['username', 'password', 'salt','email'])
 
-        user_data = [[username, hashlib.sha256(password).hexdigest(), salt.hex(),email]]
-        df_new = pd.DataFrame(user_data, columns=['username', 'password', 'salt','email'])
-        df_combined = pd.concat([df, df_new], ignore_index=True)
-        df_combined.to_csv(user_csv_path, index=False)
 
-        status = f"[✓] Utilisateur {username} enregistré avec succès."
-        label_password = tk.Label(fenetre, text=status, fg="green")
-        label_password.place(x=150, y=110)
-        add_log(type,username,status)
-
-        df_produit = pd.DataFrame(columns=['NOM', 'PRIX', 'QUANTITE'])
-        df_produit.to_csv(chemin_fichier, index=False)
-
-        return True
+        if email in df['email'].values:
+                status = "[X] Cette email existe déjà."
+                label_username = tk.Label(fenetre, text=status, fg="red")
+                label_username.place(x=150, y=110)
+                add_log(type,username,status)
+                return False
 
 
 
@@ -116,7 +151,7 @@ def password_compromises(password):
     password_is_compromise = False
 
     nom_fichier = "hashed_passwords.csv"
-    chemin_fichier = os.path.join('password', nom_fichier)
+    chemin_fichier = os.path.join('security', nom_fichier)
     df = pd.read_csv(chemin_fichier)
     df['Hashed'] = df['Hashed'].str.strip()
     password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -171,17 +206,82 @@ def haveibeenpwnd_password(password):
 
         return False
     
-def envoyer_email(email):
+def envoyer_email(email,type,code):
 
     serveur = 'smtp.gmail.com'
     port = 465
     email_expediteur = 't84089972@gmail.com'
     mdp_expediteur = 'wkibkccwhvllbzsy'
     msg = MIMEMultipart()
-    msg['From'] = email_expediteur
+    msg['From'] = 'Support App'
     msg['To'] = email
-    msg['Subject'] = 'Réinitialisation de mot de passe'
-    msg.attach(MIMEText('Votre mot de passe est compromis dépêchez vous de le changer !', 'plain'))
+    texte_message = ""
+
+    if type=='check_register' :
+        msg['Subject'] = "Confirmation d'email"
+        texte_message = f'''
+        Bonjour,
+
+        Merci de vous être inscrit sur notre application. Pour compléter la création de votre compte, veuillez utiliser le code de vérification ci-dessous :
+
+        Code de vérification : {code}
+
+        Si vous n'avez pas demandé cette vérification, veuillez ignorer cet email.
+
+        Cordialement,
+        L'équipe Support App
+        '''
+
+    if type=='login' :
+        msg['Subject'] = "Alerte : Mot de passe compromis"
+        texte_message = f'''
+        Bonjour,
+
+        Nous avons détecté que votre mot de passe pour notre application a été compromis. Par mesure de sécurité, nous vous recommandons de le changer immédiatement.
+
+        Pour votre sécurité, nous vous conseillons de choisir un mot de passe unique et robuste.
+
+        Si vous n'avez pas effectué cette modification ou si vous avez des questions, veuillez nous contacter immédiatement.
+
+        Cordialement,
+        L'équipe Support App
+        '''
+    if type == 'password_changed' :
+        msg['Subject'] = "Notification de changement de mot de passe"
+        texte_message = f'''
+        Bonjour,
+
+        Nous vous informons que votre mot de passe a été modifié avec succès. Si vous avez effectué cette modification, vous pouvez ignorer cet email.
+
+        Si vous n'êtes pas à l'origine de ce changement ou si vous souhaitez réinitialiser votre mot de passe, veuillez vous rendre dans la section "Gestion de compte", puis cliquez sur "Récupération de compte" pour récupérer l'accès à votre compte.
+
+        Si vous avez des questions ou si vous avez besoin d'assistance supplémentaire, n'hésitez pas à nous contacter.
+
+        Cordialement,
+        L'équipe Support App
+        '''
+
+    if type == 'password_recovery' :
+        msg['Subject'] = "Récupération de mot de passe"
+        texte_message = f'''
+        Bonjour,
+
+        Nous avons reçu une demande de récupération de votre mot de passe pour votre compte. Pour procéder à la récupération, veuillez utiliser le code de vérification ci-dessous :
+
+        Code de vérification : {code}
+
+        Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email. Si vous avez des questions ou si vous avez besoin d'assistance supplémentaire, n'hésitez pas à nous contacter.
+
+        Cordialement,
+        L'équipe Support App
+        '''
+
+
+
+
+
+
+    msg.attach(MIMEText(texte_message, 'plain'))
  
     try:
         serveur_smtp = smtplib.SMTP_SSL(serveur, port)
@@ -198,10 +298,16 @@ def envoyer_email(email):
 
 
 
-
-
-
-
+    
+def clear_window(fenetre):
+    for widget in fenetre.winfo_children():
+        if widget.winfo_ismapped():
+            if widget.winfo_manager() == 'pack':
+                widget.pack_forget()
+            elif widget.winfo_manager() == 'grid':
+                widget.grid_forget()
+            elif widget.winfo_manager() == 'place':
+                widget.place_forget() 
 
 
 

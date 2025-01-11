@@ -5,9 +5,10 @@ from modules.connexion import haveibeenpwnd_password
 import requests
 import tkinter as tk
 from modules.log import *
+from modules.connexion import *
 
 
-def modifier_password(username, entrée1_change,entrée2_change,fenetre):
+def modifier_password(username, entrée1_change,entrée2_change,fenetre, email):
     type = 'change_password'
     
     old_password = entrée1_change.get()
@@ -33,7 +34,7 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
         verif=False
 
     if verif:
-
+        
         status = f"[✓] Mot de passe changé."
         label_password = tk.Label(fenetre, text=status, fg="green")
         label_password.place(x=150, y=110)
@@ -49,8 +50,8 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
         df.to_csv(user_csv_path, index=False)
 
         
-
         return True
+    
     else :
         status = "[X] Mauvais mot de passe."
         label_password = tk.Label(fenetre, text=status, fg="red")
@@ -62,7 +63,7 @@ def modifier_password(username, entrée1_change,entrée2_change,fenetre):
 def haveibeenpwnd_password_check(entrée_check,fenetre,username):
     
    
-    csv_path = 'password/log.csv'
+    csv_path = 'security/log.csv'
     df = pd.read_csv(csv_path)
     type = 'check_password'
     

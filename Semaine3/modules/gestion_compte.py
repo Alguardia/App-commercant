@@ -53,6 +53,40 @@ def supprimer_user(entrée1_remove,entrée2_remove, fenetre):
         add_log(type,username,status)
         return False
 
+def recuperation_compte(entrée1,email,fenetre):
+    type = 'email_recover'
+    password = entrée1.get()
+
+    user_csv_path = 'data/user.csv'
+    df = pd.read_csv(user_csv_path)
+
+
+    filtered_df = df.loc[df['email'] == email]
+
+    if filtered_df.empty:
+        return False
+
+
+
+    status = f"[✓] Mot de passe changé."
+    label_password = tk.Label(fenetre, text=status, fg="green")
+    label_password.place(x=150, y=110)
+    add_log(type,email,status)
+    filtered_df = df.loc[df['email'] == email]
+    salt = bytes.fromhex(filtered_df['salt'].values[0])
+    nouveau_password_combined = password.encode("utf-8") + salt
+    nouveau_password_hashed = hashlib.sha256(nouveau_password_combined).hexdigest()
+
+    df.loc[df['email'] == email, 'password'] = nouveau_password_hashed
+
+        
+    df.to_csv(user_csv_path, index=False)
+    return True
+
+
+
+
+
 
 
 
