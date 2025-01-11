@@ -1,5 +1,4 @@
 import os
-from tabulate import tabulate
 import csv
 import pandas as pd
 import tkinter as tk
