@@ -58,3 +58,27 @@ id,date,time,user,processus,details
 57,11/01/2025,15:52:12,root,disconnect,[!] root s'est déconnecter
 58,11/01/2025,15:59:22,abruyant@guardiaschool.fr,email_recover,[X] Cet email n'existe pas.
 59,11/01/2025,16:00:06,abruyant@guuhzdq.fr,email_recover,[X] Cet email n'existe pas.
+60,11/01/2025,17:39:32,alex,register,[✓] Utilisateur alex enregistré avec succès.
+61,11/01/2025,18:13:11,root,login,[✓] Connexion réusite.
+62,11/01/2025,18:15:34,root,disconnect,[!] root s'est déconnecter
+63,11/01/2025,18:15:38,root,login,[✓] Connexion réusite.
+64,11/01/2025,18:15:59,root,change_password,[✓] Mot de passe changé.
+65,11/01/2025,18:16:14,root,disconnect,[!] root s'est déconnecter
+66,11/01/2025,18:16:39,zouki78@gmail.com,email_recover,[✓] Mot de passe changé.
+67,11/01/2025,18:16:46,root,login,[✓] Connexion réusite.
+68,11/01/2025,18:16:49,root,disconnect,[!] root s'est déconnecter
+69,11/01/2025,18:17:34,selim,register,[✓] Utilisateur selim enregistré avec succès.
+70,11/01/2025,18:21:19,root,login,[✓] Connexion réusite.
+71,11/01/2025,18:21:43,root,login,[✓] Connexion réusite.
+72,11/01/2025,18:21:58,root,disconnect,[!] root s'est déconnecter
+73,11/01/2025,18:23:22,root,login,[✓] Connexion réusite.
+74,11/01/2025,18:23:49,root,check_password,[X] Le mot de passe est compromis 142953 fois.
+75,11/01/2025,18:24:45,root,disconnect,[!] root s'est déconnecter
+76,11/01/2025,18:25:25,root,login,[✓] Connexion réusite.
+77,11/01/2025,18:25:47,root,check_password,[X] Le mot de passe est compromis 142953 fois.
+78,11/01/2025,18:31:58,root,exit,[X] root a quitter l'application
+79,11/01/2025,18:32:03,root,disconnect,[!] root s'est déconnecter
+80,11/01/2025,18:38:02,alex,register,[X] Changer de mot de passe.
+81,11/01/2025,18:39:29,alex,register,[X] Changer de mot de passe.
+82,11/01/2025,18:40:22,alex,register,[X] Changer de mot de passe.
+83,11/01/2025,18:42:00,alex,register,[X] Changer de mot de passe.

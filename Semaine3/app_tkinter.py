@@ -115,8 +115,8 @@ def menu_login():
 
 def register_inter():
     global fenetre, entrée1_register , entrée2_register , entrée3_register
-    register(entrée1_register,entrée2_register, entrée3_register, fenetre)
-    menu_verif_email(entrée3_register,fenetre)
+    if register(entrée1_register,entrée2_register, entrée3_register, fenetre):
+        menu_verif_email(entrée3_register,fenetre)
 
 def verif_email_inter():
     global fenetre, code, entrée1_mail

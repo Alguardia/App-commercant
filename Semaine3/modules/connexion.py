@@ -101,7 +101,7 @@ def register(entrée1_register,entrée2_register, entrée3_register , fenetre):
                 add_log(type,username,status)
                 return False
 
-
+    return True
 
 
 def verifier_utilisateur(username, password):
